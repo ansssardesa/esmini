@@ -866,6 +866,13 @@ extern "C"
 
     SE_DLL_API void *SE_GetODRManager();
 
+        /**
+         * Return pointer to internal ScenarioPlayer instance as void*.
+         * Use with caution: this exposes internal implementation detail. Cast to proper type if needed.
+         * @return pointer to internal ScenarioPlayer or NULL if not initialized
+         */
+        SE_DLL_API void *SE_GetPlayer();
+
     /**
     Specify if and how position object will align to the road. The setting is done for individual components:
     Z (elevation), Heading, Pitch, Roll and separately for set- and update operation. Set operations represents
@@ -1124,13 +1131,38 @@ extern "C"
     */
     SE_DLL_API int SE_GetObjectInLaneType(int object_id);
 
-    /**
+    /** 
             Get the overrideActionStatus of specified object
             @param objectId Id of the object
             @param list Pointer/reference to a SE_OverrideActionList struct to be filled in
             @return 0 if successful, -1 if not
     */
     SE_DLL_API int SE_GetOverrideActionStatus(int objectId, SE_OverrideActionList *list);
+
+    /**
+            Assign an ExternalController to an existing object and activate domains.
+            @param object_id Id of the object
+            @param activateLat 1=activate lateral domain, 0=do not
+            @param activateLong 1=activate longitudinal domain, 0=do not
+            @param mode_str Optional mode string: "override" or "additive" (pass NULL for default override)
+            @return 0 if successful, -1 if not
+    */
+        SE_DLL_API int SE_AssignExternalController(int object_id, int activateLat, int activateLong);
+
+    /**
+            Unassign controllers of specified type from an object.
+            @param object_id Id of the object
+            @param controllerTypeName Type name string of controller to remove (e.g. "ExternalController").
+            @return 0 if successful, -1 if not
+    */
+    SE_DLL_API int SE_UnassignControllerByType(int object_id, const char *controllerTypeName);
+
+    /**
+            Unassign all controllers from an object.
+            @param object_id Id of the object
+            @return 0 if successful, -1 if not
+    */
+    SE_DLL_API int SE_UnassignAllControllers(int object_id);
 
     /**
             Get the type name of the specifed vehicle-, pedestrian- or misc object

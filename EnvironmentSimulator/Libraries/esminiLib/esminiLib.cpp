@@ -1220,6 +1220,99 @@ extern "C"
         return 0;
     }
 
+    SE_DLL_API int SE_AssignExternalController(int object_id, int activateLat, int activateLong)
+    {
+        if (player == nullptr)
+            return -1;
+
+        Object *obj = nullptr;
+        if (getObjectById(object_id, obj) == -1)
+            return -1;
+
+        // Instantiate external controller
+        Controller::InitArgs args = {"", CONTROLLER_EXTERNAL_TYPE_NAME, 0, 0, 0, 0};
+
+        Controller *ctrl = InstantiateControllerExternal(&args);
+        if (ctrl == nullptr)
+            return -1;
+
+        // Register with reader and assign to object
+        player->scenarioEngine->scenarioReader->AddController(ctrl);
+        obj->AssignController(ctrl);
+
+        // Build activation C-array according to ControlDomains::COUNT and call Activate
+        const unsigned int domainCount = static_cast<unsigned int>(ControlDomains::COUNT);
+        ControlActivationMode modesArr[static_cast<size_t>(ControlDomains::COUNT)];
+        for (unsigned int i = 0; i < domainCount; ++i)
+            modesArr[i] = ControlActivationMode::OFF;
+
+        modesArr[static_cast<unsigned int>(ControlDomains::DOMAIN_LAT)] = activateLat ? ControlActivationMode::ON : ControlActivationMode::OFF;
+        modesArr[static_cast<unsigned int>(ControlDomains::DOMAIN_LONG)] = activateLong ? ControlActivationMode::ON : ControlActivationMode::OFF;
+
+        ctrl->Activate(modesArr);
+
+        // Link controller to object (if not done by AssignController)
+        ctrl->LinkObject(obj);
+
+        return 0;
+    }
+
+    SE_DLL_API int SE_UnassignControllerByType(int object_id, const char *controllerTypeName)
+    {
+        if (player == nullptr)
+            return -1;
+
+        Object *obj = nullptr;
+        if (getObjectById(object_id, obj) == -1)
+            return -1;
+
+        if (controllerTypeName == nullptr)
+            return -1;
+
+        std::vector<Controller *> toRemove;
+        for (auto &ctrl : obj->controllers_)
+        {
+            if (std::string(ctrl->GetTypeName()) == std::string(controllerTypeName))
+            {
+                toRemove.push_back(ctrl);
+            }
+        }
+
+        for (auto ctrl : toRemove)
+        {
+            obj->UnassignController(ctrl);
+            ctrl->UnlinkObject();
+            player->scenarioEngine->scenarioReader->RemoveController(ctrl);
+        }
+
+        return 0;
+    }
+
+    SE_DLL_API int SE_UnassignAllControllers(int object_id)
+    {
+        if (player == nullptr)
+            return -1;
+
+        Object *obj = nullptr;
+        if (getObjectById(object_id, obj) == -1)
+            return -1;
+
+        std::vector<Controller *> controllersCopy = obj->controllers_;
+        for (auto ctrl : controllersCopy)
+        {
+            obj->UnassignController(ctrl);
+            ctrl->UnlinkObject();
+            player->scenarioEngine->scenarioReader->RemoveController(ctrl);
+        }
+
+        return 0;
+    }
+
+    SE_DLL_API void *SE_GetPlayer()
+    {
+        return reinterpret_cast<void *>(player);
+    }
+
     SE_DLL_API int SE_ReportObjectPosXYH(int object_id, float timestamp, float x, float y, float h)
     {
         Object *obj = nullptr;
