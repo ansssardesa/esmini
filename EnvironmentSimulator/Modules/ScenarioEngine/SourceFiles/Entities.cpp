@@ -274,6 +274,21 @@ scenarioengine::Controller* Object::GetControllerActiveOnDomain(ControlDomains d
     return GetControllerActiveOnDomainMask(ControlDomain2DomainMask(domain));
 }
 
+int Object::OverrideController(const char* controller_name)
+{
+    UnassignControllers();
+
+    Controller* new_controller = Controller::Create(controller_name, "OverriddenController");
+    if (new_controller)
+    {
+        new_controller->LinkObject(this);
+        AssignController(new_controller);
+        return 0;
+    }
+
+    return -1;
+}
+
 scenarioengine::Controller::Type Object::GetControllerTypeActiveOnDomain(ControlDomains domain)
 {
     scenarioengine::Controller* ctrl = GetControllerActiveOnDomain(domain);

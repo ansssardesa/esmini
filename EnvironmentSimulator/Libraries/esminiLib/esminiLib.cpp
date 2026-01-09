@@ -1393,6 +1393,15 @@ extern "C"
         return 0;
     }
 
+    SE_DLL_API int SE_OverrideController(int object_id, const char *controller)
+    {
+        Object *obj = nullptr;
+        if (getObjectById(object_id, obj) != 0)
+            return -1;
+
+        return obj->OverrideController(controller);
+    }
+
     SE_DLL_API int SE_SetSnapLaneTypes(int object_id, int laneTypes)
     {
         Object *obj = nullptr;
