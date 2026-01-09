@@ -274,6 +274,36 @@ scenarioengine::Controller* Object::GetControllerActiveOnDomain(ControlDomains d
     return GetControllerActiveOnDomainMask(ControlDomain2DomainMask(domain));
 }
 
+int Object::OverrideController(const char* controller_name)
+{
+    UnassignControllers();
+    if (auto *new_controller = Controller::Create(controller_name, "OverriddenController"); new_controller != nullptr)
+    {
+        const auto            domainCount = static_cast<size_t>(ControlDomains::COUNT);
+        ControlActivationMode modesArr[domainCount];
+        for (auto& each : modesArr)
+        {
+            each = ControlActivationMode::OFF;
+        }
+
+        modesArr[static_cast<unsigned int>(ControlDomains::DOMAIN_LAT)]  = ControlActivationMode::ON;
+        modesArr[static_cast<unsigned int>(ControlDomains::DOMAIN_LONG)] = ControlActivationMode::ON;
+
+        new_controller->Activate(modesArr);
+        new_controller->LinkObject(this);
+        AssignController(new_controller);
+
+        auto longMask = static_cast<unsigned int>(ControlDomain2DomainMask(ControlDomains::DOMAIN_LONG));
+        auto latMask  = static_cast<unsigned int>(ControlDomain2DomainMask(ControlDomains::DOMAIN_LAT));
+
+        if (new_controller->IsActiveOnDomains(longMask) && new_controller->IsActiveOnDomains(latMask))
+        {
+            return 0;
+        }
+    }
+    return -1;
+}
+
 scenarioengine::Controller::Type Object::GetControllerTypeActiveOnDomain(ControlDomains domain)
 {
     scenarioengine::Controller* ctrl = GetControllerActiveOnDomain(domain);

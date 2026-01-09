@@ -81,6 +81,8 @@ namespace scenarioengine
             return CONTROLLER_BASE_TYPE_ID;
         }
 
+        static Controller* Create(const std::string& type, const std::string& name);
+
         virtual void LinkObject(Object* object);
         virtual void UnlinkObject();
         virtual int  Activate(const ControlActivationMode (&mode)[static_cast<unsigned int>(ControlDomains::COUNT)]);

@@ -1061,8 +1061,16 @@ extern "C"
     SE_DLL_API int SE_ReportObjectWheelStatus(int object_id, float rotation, float angle);
 
     /**
-            Specify which lane types the position object snaps to (is aware of)
-            @param object_id Id of the object
+            Override the controller of a specified object.
+            @param object_id The ID of the object whos internal controller overriden with external controler.
+            @param controller The name of the controller to use (e.g., "CustomNamedController").
+            @return 0 if successful, -1 if not.
+    */
+    SE_DLL_API int SE_OverrideController(int object_id, const char *controller);
+
+    /**
+            Set lane types to snap to for a given object.
+            @param object_id The ID of the object
             @param laneTypes A combination (bitmask) of lane types according to roadmanager::Lane::LaneType
             examples: ANY_DRIVING = 1966594, ANY_ROAD = 1966734, ANY = -1
             @return 0 if successful, -1 if not

@@ -564,6 +564,8 @@ namespace scenarioengine
             return nextJunctionSelectorAngle_;
         }
 
+        int OverrideController(const char* controller_name);
+
         // Rel2abs Controller addition
         void addEvent(Event* event)
         {

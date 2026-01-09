@@ -16,7 +16,53 @@
 #include "ScenarioEngine.hpp"
 #include "logger.hpp"
 
+#include "ControllerExternal.hpp"
+#include "ControllerFollowGhost.hpp"
+#include "ControllerFollowRoute.hpp"
+#include "ControllerInteractive.hpp"
+#include "ControllerSloppyDriver.hpp"
+#include "ControllerRel2Abs.hpp"
+#include "ControllerACC.hpp"
+#include "ControllerNaturalDriver.hpp"
+#include "ControllerALKS.hpp"
+#include "ControllerUDPDriver.hpp"
+#include "ControllerALKS_R157SM.hpp"
+#include "ControllerLooming.hpp"
+#include "ControllerOffroadFollower.hpp"
+#include "ControllerHID.hpp"
+#include "ControllerFollowReference.hpp"
+
 using namespace scenarioengine;
+
+Controller* Controller::Create(const std::string& type, const std::string& name)
+{
+    Controller::InitArgs args;
+    args.name = name;
+    args.type = type;
+    args.properties = nullptr;
+    args.gateway = nullptr;
+    args.scenario_engine = nullptr;
+    args.parameters = nullptr;
+
+    if (type == "External")           return new ControllerExternal(&args);
+    if (type == "FollowGhost")        return new ControllerFollowGhost(&args);
+    if (type == "FollowRoute")        return new ControllerFollowRoute(&args);
+    if (type == "Interactive")        return new ControllerInteractive(&args);
+    if (type == "SloppyDriver")       return new ControllerSloppyDriver(&args);
+    if (type == "Rel2Abs")            return new ControllerRel2Abs(&args);
+    if (type == "ACC")                return new ControllerACC(&args);
+    if (type == "NaturalDriver")      return new ControllerNaturalDriver(&args);
+    if (type == "ALKS")               return new ControllerALKS(&args);
+    if (type == "UDPDriver")          return new ControllerUDPDriver(&args);
+    if (type == "ALKS_R157SM")         return new ControllerALKS_R157SM(&args);
+    if (type == "Looming")            return new ControllerLooming(&args);
+    if (type == "OffroadFollower")    return new ControllerOffroadFollower(&args);
+    if (type == "HID")                return new ControllerHID(&args);
+    if (type == "FollowReference")    return new ControllerFollowReference(&args);
+    
+    LOG_WARN("Unknown controller type: {}", type);
+    return nullptr;
+}
 
 Controller* scenarioengine::InstantiateController(void* args)
 {
