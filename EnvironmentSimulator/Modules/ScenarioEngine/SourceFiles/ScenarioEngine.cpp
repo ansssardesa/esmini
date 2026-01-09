@@ -849,6 +849,13 @@ void ScenarioEngine::prepareGroundTruth(double dt)
                 obj->pos_.SetAcc(o->state_.pos.GetAccX(), o->state_.pos.GetAccY(), o->state_.pos.GetAccZ());
                 obj->SetDirtyBits(Object::DirtyBit::ACCELERATION);
             }
+            // If external gateway provided velocity, propagate it to the internal object so it won't be
+            // overwritten by calculated values later in this function.
+            if (o->dirty_ & Object::DirtyBit::VELOCITY)
+            {
+                obj->pos_.SetVel(o->state_.pos.GetVelX(), o->state_.pos.GetVelY(), o->state_.pos.GetVelZ());
+                obj->SetDirtyBits(Object::DirtyBit::VELOCITY);
+            }
             if (o->dirty_ & Object::DirtyBit::SPEED)
             {
                 obj->speed_ = o->state_.info.speed;
