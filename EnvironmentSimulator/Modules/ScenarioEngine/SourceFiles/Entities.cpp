@@ -279,11 +279,31 @@ int Object::OverrideController(const char* controller_name)
     UnassignControllers();
 
     Controller* new_controller = Controller::Create(controller_name, "OverriddenController");
+
     if (new_controller)
     {
+        const auto            domainCount = static_cast<size_t>(ControlDomains::COUNT);
+        ControlActivationMode modesArr[domainCount];
+        for (auto& each : modesArr)
+        {
+            each = ControlActivationMode::OFF;
+        }
+
+        modesArr[static_cast<unsigned int>(ControlDomains::DOMAIN_LAT)]  = ControlActivationMode::ON;
+        modesArr[static_cast<unsigned int>(ControlDomains::DOMAIN_LONG)] = ControlActivationMode::ON;
+
+        new_controller->Activate(modesArr);
         new_controller->LinkObject(this);
         AssignController(new_controller);
-        return 0;
+
+        auto longMask = static_cast<unsigned int>(ControlDomain2DomainMask(ControlDomains::DOMAIN_LONG));
+        auto latMask  = static_cast<unsigned int>(ControlDomain2DomainMask(ControlDomains::DOMAIN_LAT));
+
+        if (new_controller->IsActiveOnDomains(longMask) && new_controller->IsActiveOnDomains(latMask))
+        {
+            return 0;
+        }
+        return -1;
     }
 
     return -1;
