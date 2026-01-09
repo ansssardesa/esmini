@@ -283,15 +283,7 @@ int Object::OverrideController(const char* controller_name)
     {
         new_controller->LinkObject(this);
         AssignController(new_controller);
-        // verify controller is active for both longitudinal and lateral domains
-        auto longMask = static_cast<unsigned int>(ControlDomain2DomainMask(ControlDomains::DOMAIN_LONG));
-        auto latMask  = static_cast<unsigned int>(ControlDomain2DomainMask(ControlDomains::DOMAIN_LAT));
-
-        if (new_controller->IsActiveOnDomains(longMask) && new_controller->IsActiveOnDomains(latMask))
-        {
-            return 0;
-        }
-        return -1;
+        return 0;
     }
 
     return -1;
