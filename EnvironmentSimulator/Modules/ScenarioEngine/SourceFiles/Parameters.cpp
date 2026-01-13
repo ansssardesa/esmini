@@ -552,13 +552,9 @@ void Parameters::parseParameterDeclarations(pugi::xml_node declarationsNode, OSC
             param.type        = OSCParameterDeclarations::ParameterType::PARAM_TYPE_BOOL;
             param.value._bool = param.value._string == "true" ? true : false;
         }
-        else if (type_str == "string")
+        else if (type_str == "string" || type_str == "unsignedInt" || type_str == "unsignedShort" || type_str == "dateTime")
         {
             param.type = OSCParameterDeclarations::ParameterType::PARAM_TYPE_STRING;
-        }
-        else if (type_str == "unsignedInt" || type_str == "unsignedShort" || type_str == "dateTime")
-        {
-            LOG_ERROR("Type {} is not supported yet", type_str);
         }
         else
         {
